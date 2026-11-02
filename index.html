@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System</title>
+</head>
+<body>
+
+    
+
+    <script>
+
+        // 1. إنشاء Class باسم Student
+        // الكلاس هو القالب الذي سنستخدمه لإنشاء كائنات الطلاب
+
+        class Student {
+
+            // Constructor يستقبل 4 خصائص عند إنشاء كل طالب
+            constructor(id, name, grades, attendance) {
+
+                // تخزين رقم الجلوس داخل الكائن
+                this.id = id;
+
+                // تخزين اسم الطالب
+                this.name = name;
+
+                // تخزين درجات المواد الثلاث داخل Array
+                this.grades = grades;
+
+                // تخزين نسبة الحضور
+                this.attendance = attendance;
+
+            }
+
+
+            // 2. دالة حساب المتوسط باستخدام reduce
+            calculateAverage() {
+
+                // reduce تجمع درجات المواد الثلاث
+                // sum يمثل المجموع و grade تمثل درجة كل مادة
+                const total = this.grades.reduce((sum, grade) => {
+                    return sum + grade;
+                }, 0);
+
+                // قسمة مجموع الدرجات على عدد المواد
+                return total / this.grades.length;
+
+            }
+
+
+            // دالة تحديد التقدير بالحروف باستخدام if / else
+            getGrade(average) {
+
+                // لو المتوسط 90 أو أكثر يكون التقدير A
+                if (average >= 90) {
+                    return "A";
+                }
+
+                // لو المتوسط 80 أو أكثر يكون التقدير B
+                else if (average >= 80) {
+                    return "B";
+                }
+
+                // لو المتوسط 70 أو أكثر يكون التقدير C
+                else if (average >= 70) {
+                    return "C";
+                }
+
+                // لو المتوسط 60 أو أكثر يكون التقدير D
+                else if (average >= 60) {
+                    return "D";
+                }
+
+                // لو المتوسط 50 أو أكثر يكون التقدير E
+                else if (average >= 50) {
+                    return "E";
+                }
+
+                // لو المتوسط أقل من 50 يكون التقدير F
+                else {
+                    return "F";
+                }
+
+            }
+
+
+            // دالة تحديد النتيجة النهائية للطالب
+            getResult(average) {
+
+                // && معناها AND
+                // يجب أن يكون المتوسط 50 أو أكثر
+                // ونسبة الحضور 75 أو أكثر في نفس الوقت
+
+                if (average >= 50 && this.attendance >= 75) {
+                    return "ناجح";
+                }
+
+                // لو أحد الشرطين لم يتحقق يحتاج الطالب مراجعة
+                else {
+                    return "يحتاج مراجعة";
+                }
+
+            }
+
+        }
+
+
+        // 3. إنشاء المصفوفة الرئيسية studentsList
+        // تحتوي على أربعة كائنات من Class Student
+        // كل كائن يحتوي على رقم الجلوس والاسم والدرجات والحضور
+
+        const studentsList = [
+
+            new Student(301, "Mona", [45, 48, 42], 90),
+
+            new Student(302, "Youssef", [65, 70, 60], 85),
+
+            new Student(303, "Hana", [40, 45, 50], 80),
+
+            new Student(304, "Ali", [90, 95, 85], 95)
+
+        ];
+
+
+        // 4. طباعة تقرير جميع الطلاب في Console
+
+        console.log("===== STUDENTS REPORT =====");
+
+        // forEach تمر على كل طالب داخل المصفوفة
+        // وتحسب المتوسط والتقدير والنتيجة الخاصة به
+
+        studentsList.forEach(student => {
+
+            // حساب متوسط الطالب
+            const average = student.calculateAverage();
+
+            //طباعة بيانات الطالب 
+            console.log({
+                ID: student.id,
+                Name: student.name,
+                Average: average,
+                Grade: student.getGrade(average),
+                Result: student.getResult(average)
+            });
+
+        });
+
+
+        // 5. استخراج الطلاب المتعثرين باستخدام filter
+        // نختار الطلاب الذين متوسطهم من 40 إلى 49
+
+        const strugglingStudents = studentsList.filter(student => {
+
+            // حساب متوسط الطالب
+            const average = student.calculateAverage();
+
+            // إرجاع الطلاب الذين يحقق متوسطهم الشرطين
+            return average >= 40 && average <= 49;
+
+        });
+
+
+        // طباعة قائمة الطلاب المتعثرين
+        console.log("===== STRUGGLING STUDENTS =====");
+
+        console.table(strugglingStudents);
+
+
+        // 6. استخدام map لإضافة 5 درجات رأفة
+        // map تنشئ مصفوفة جديدة دون تغيير المصفوفة الأصلية
+
+        const studentsAfterBonus = strugglingStudents.map(student => {
+
+            // حساب المتوسط الأصلي للطالب
+            const oldAverage = student.calculateAverage();
+
+            // إرجاع بيانات الطالب مع إضافة 5 درجات للمتوسط
+            return {
+                id: student.id,
+                name: student.name,
+                oldAverage: oldAverage,
+                newAverage: oldAverage + 5
+            };
+
+        });
+
+
+        // 7. استخدام reduce لجمع المتوسطات الجديدة بعد الرأفة
+
+        const totalNewAverages = studentsAfterBonus.reduce((sum, student) => {
+
+            // إضافة متوسط كل طالب إلى المجموع الكلي
+            return sum + student.newAverage;
+
+        }, 0);
+
+
+        // 8. حساب المتوسط العام للطلاب بعد الرأفة
+        // length > 0 تحمي البرنامج من القسمة على صفر
+        // إذا كانت المصفوفة فارغة تكون النتيجة صفر
+
+        const bonusAverage = studentsAfterBonus.length > 0
+            ? totalNewAverages / studentsAfterBonus.length
+            : 0;
+
+
+        // 9. طباعة تقرير لجنة الرأفة في Console
+
+        console.log("===== BONUS COMMITTEE REPORT =====");
+
+        // عرض الطلاب بعد إضافة درجات الرأفة في جدول
+        console.table(studentsAfterBonus);
+
+        // طباعة عدد الطلاب الذين حصلوا على الرأفة
+        console.log("Number of Students:", studentsAfterBonus.length);
+
+        // طباعة مجموع المتوسطات الجديدة
+        console.log("Total New Averages:", totalNewAverages);
+
+        // طباعة المتوسط العام بعد الرأفة
+        console.log("Average After Bonus:", bonusAverage);
+
+
+    </script>
+
+</body>
+</html>
